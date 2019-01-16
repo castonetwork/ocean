@@ -69,7 +69,7 @@ const setupNode = async ({node, serviceId}) => {
                   addPeerMarker({map, latitude: flowLatitude, longitude: flowLongitude, name: id });
                   addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords});
                   Object.entries(waveIds).map(([id])=>waves[id])
-                    .forEach(waveCoords => addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords: waveCoords}));
+                    .forEach(waveCoords => addPeerRoutes({map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
                 }
               );
               Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude && obj.coords.longitude)
