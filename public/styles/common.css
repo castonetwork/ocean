@@ -1,0 +1,45 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#mapid {
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-marker-icon[title="home"] {
+  filter: invert(0.5) sepia(1) saturate(10);
+}
+
+.leaflet-marker-icon:not([title="home"]) {
+  filter: invert(0.5) sepia(0.2) saturate(100) hue-rotate(90deg);
+}
+
+/* animate path */
+@keyframes line {
+  0% {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dash {
+  from {
+    stroke-dasharray: 7;
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dasharray: 7;
+    stroke-dashoffset: 0;
+  }
+}
+
+path {
+  animation: line 3s, dash 3s 1s linear infinite;
+}

@@ -1,0 +1,41 @@
+{
+  "name": "ocean",
+  "version": "1.0.0",
+  "description": "casto dashboard",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel -p 7890 ./public/index.html"
+  },
+  "staticFiles": {
+    "staticPath": "public",
+    "watcherGlob": "**"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/castonetwork/ocean.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/castonetwork/ocean/issues"
+  },
+  "homepage": "https://github.com/castonetwork/ocean#readme",
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "libp2p": "^0.22.0",
+    "libp2p-mplex": "^0.8.4",
+    "libp2p-websocket-star": "^0.10.2",
+    "lodash.isfunction": "^3.0.9",
+    "peer-info": "^0.15.1",
+    "pull-many": "^1.0.8",
+    "pull-notify": "^0.1.1",
+    "pull-stream": "^3.6.9",
+    "pull-stringify": "^2.0.0",
+    "pull-tap": "^1.1.1"
+  },
+  "devDependencies": {
+    "parcel": "^1.11.0",
+    "parcel-plugin-static-files-copy": "^2.0.0"
+  }
+}
