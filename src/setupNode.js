@@ -38,14 +38,10 @@ window.addPeerRoutes = addPeerRoutes;
 
 const setupNode = async ({node, serviceId}) => {
   let peers = {};
-  const {coords} = await new Promise((r, e) =>
-    navigator.geolocation.getCurrentPosition(p => r(p), err => e(err))
-  );
   const map = L.map("mapid", {renderer: L.svg()}).setView(
-    [coords.latitude, coords.longitude],
+    [0, 180],
     3
   );
-  window.map = map;
   const dialToPrism = peerInfo =>
     node.dialProtocol(peerInfo, `/prism/${serviceId}/info`, async (err, conn) => {
       if (err) {
@@ -64,16 +60,16 @@ const setupNode = async ({node, serviceId}) => {
               // add a marker of prism
               addPeerMarker({map, latitude: coords.latitude, longitude: coords.longitude, name: "prism"});
               // add markers of flows
-              Object.entries(flows).filter(([id, obj])=>obj.coords)
+              flows && Object.entries(flows).filter(([id, obj])=>obj.coords)
                 .forEach(([id, {coords: {latitude: flowLatitude, longitude: flowLongitude}, waves: waveIds}])=> {
                   addPeerMarker({map, latitude: flowLatitude, longitude: flowLongitude, name: id });
                   addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords})
                     ._path.classList.add('flows');
-                  Object.entries(waveIds).map(([id])=>waves[id].coords)
+                  waveIds && Object.entries(waveIds).map(([id])=>waves[id].coords)
                     .forEach(waveCoords => addPeerRoutes({map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
                 }
               );
-              Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude && obj.coords.longitude)
+              waves && Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude && obj.coords.longitude)
                 .forEach(([id, {coords: {latitude: waveLatitude, longitude: waveLongitude}}])=> {
                   addPeerMarker({map, latitude: waveLatitude, longitude: waveLongitude, name: id})
                 })
@@ -116,11 +112,11 @@ const setupNode = async ({node, serviceId}) => {
     console.log('>> ',
       node.peerInfo.multiaddrs.toArray().map(o => o.toString()))
   });
-  initMap({map, coords});
+  initMap({map});
 };
 
 let paths = [];
-const initMap = async ({map, coords}) => {
+const initMap = async ({map}) => {
   L.tileLayer(
     "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
     {
