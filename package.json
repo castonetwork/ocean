@@ -4,7 +4,8 @@
   "description": "casto dashboard",
   "main": "index.js",
   "scripts": {
-    "start": "parcel -p 7890 ./public/index.html"
+    "start": "parcel -p 7890 ./public/index.html",
+    "build": "parcel build --no-source-maps ./public/index.html --public-url ./"
   },
   "staticFiles": {
     "staticPath": "public",
