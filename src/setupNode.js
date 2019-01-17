@@ -60,7 +60,7 @@ const setupNode = async ({node, serviceId}) => {
         pull.take(o => o.topic !== DIAL_TERMINATED),
         pull.drain(event => {
           const events = {
-            'prismInfo': async ({data: coords, flows, waves}) => {
+            'prismInfo': async ({data: {coords, flows, waves}}) => {
               // add a marker of prism
               addPeerMarker({map, latitude: coords.latitude, longitude: coords.longitude, name: "prism"});
               // add markers of flows
