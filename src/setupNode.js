@@ -20,13 +20,13 @@ const addPeerRoutes = ({map, latitude, longitude, coords}) =>
   L.curve(
     [
       "M",
-      [coords.latitude, coords.longitude],
+      [latitude, longitude],
       "Q",
       [
-        coords.latitude + coords.latitude * 1.1,
-        coords.longitude - (coords.longitude - longitude) * 0.2
+        latitude + latitude * 1.1,
+        longitude - (longitude - coords.longitude) * 0.2
       ],
-      [latitude, longitude]
+      [coords.latitude, coords.longitude],
     ],
     {
       color: "#ea8080"
@@ -68,7 +68,7 @@ const setupNode = async ({node, serviceId}) => {
                 .forEach(([id, {coords: {latitude: flowLatitude, longitude: flowLongitude}, waves: waveIds}])=> {
                   addPeerMarker({map, latitude: flowLatitude, longitude: flowLongitude, name: id });
                   addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords});
-                  Object.entries(waveIds).map(([id])=>waves[id])
+                  Object.entries(waveIds).map(([id])=>waves[id].coords)
                     .forEach(waveCoords => addPeerRoutes({map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
                 }
               );
