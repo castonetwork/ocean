@@ -23,7 +23,7 @@ const addPeerRoutes = ({map, latitude, longitude, coords}) =>
       [latitude, longitude],
       "Q",
       [
-        latitude + latitude * 1.1,
+        latitude + Math.abs(longitude - coords.longitude) * 0.7,
         longitude - (longitude - coords.longitude) * 0.2
       ],
       [coords.latitude, coords.longitude],
@@ -67,7 +67,8 @@ const setupNode = async ({node, serviceId}) => {
               Object.entries(flows).filter(([id, obj])=>obj.coords)
                 .forEach(([id, {coords: {latitude: flowLatitude, longitude: flowLongitude}, waves: waveIds}])=> {
                   addPeerMarker({map, latitude: flowLatitude, longitude: flowLongitude, name: id });
-                  addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords});
+                  addPeerRoutes({map, latitude: flowLatitude, longitude: flowLongitude, coords})
+                    ._path.classList.add('flows');
                   Object.entries(waveIds).map(([id])=>waves[id].coords)
                     .forEach(waveCoords => addPeerRoutes({map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
                 }
@@ -129,9 +130,5 @@ const initMap = async ({map, coords}) => {
       id: "mapbox.streets"
     }
   ).addTo(map);
-  L.marker([coords.latitude, coords.longitude], {
-    title: "home",
-    icon: radarIcon
-  }).addTo(map);
 };
 module.exports = setupNode;
