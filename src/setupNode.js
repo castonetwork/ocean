@@ -28,15 +28,16 @@ const addRouteMap = (fromId, toId, obj)=>{
   //   peerMarkerMap[toId].latitude && peerMarkerMap[toId].longitude){}
 }
 
-const removeRouter  = (peerId) =>{
+const removeRoute  = (peerId) =>{
   let filtered = Object.entries(peerRouteMap).filter(arr => arr[0].indexOf(peerId) > -1);
   filtered.forEach(o=> o[1].remove());
   filtered.forEach(o=> delete peerRouteMap[o[0]]);
 
 }
 
-const addPeerMarker = ({peerId, map, latitude, longitude, name}) =>{
-  if(!latitude || !longitude){
+const addPeerMarker = ({peerId, map, latitude, longitude, name}) => {
+  if((!latitude && latitude !== 0) ||
+     (!longitude && longitude !== 0)){
     return;
   }
   let marker = L.marker([latitude, longitude], {
@@ -47,7 +48,11 @@ const addPeerMarker = ({peerId, map, latitude, longitude, name}) =>{
   return marker;
 }
 const addPeerRoutes = ({fromId, toId, map, latitude, longitude, coords}) => {
-  if(!coords || !latitude || !longitude || !coords.latitude || !coords.longitude){
+  if(!coords ||
+    (!latitude && latitude !== 0) ||
+    (!longitude && longitude !== 0) ||
+    (!coords.latitude && coords.latitude !== 0) ||
+    (!coords.longitude && coords.longitude !== 0)){
     return;
   }
   let route = L.curve(
@@ -69,14 +74,16 @@ const addPeerRoutes = ({fromId, toId, map, latitude, longitude, coords}) => {
   return route;
 }
 
-const addRouter = (fromId, toId, map)=>{
+const addRoute = (fromId, toId, prismId, map)=>{
   let from = peerMarkerMap[fromId];
   let to = peerMarkerMap[toId];
-  addPeerRoutes({fromId, toId, map, latitude: from.latitude, longitude: from.longitude, coords:{
+  let result = addPeerRoutes({fromId, toId, map, latitude: from.latitude, longitude: from.longitude, coords:{
     latitude: to.latitude,
     longitude: to.longitude
-  }})
-
+  }});
+  if(toId === prismId){
+    result._path.classList.add('flows');
+  }
 }
 /* for Debug */
 window.addPeerMarker = addPeerMarker;
@@ -111,27 +118,25 @@ const setupNode = async ({node, serviceId}) => {
               flows && Object.entries(flows).filter(([id, obj])=>obj.coords)
                 .forEach(([id, {coords: {latitude: flowLatitude, longitude: flowLongitude}, waves: waveIds}])=> {
                   addPeerMarker({peerId: id, map, latitude: flowLatitude, longitude: flowLongitude, name: id });
-                  addPeerRoutes({fromId: id, toId: idStr, map, latitude: flowLatitude, longitude: flowLongitude, coords})
-                    ._path.classList.add('flows');
+                  addPeerRoutes({fromId: id, toId: idStr, map, latitude: flowLatitude, longitude: flowLongitude, coords})._path.classList.add('flows');
                   waveIds && Object.entries(waveIds).map(([id])=>({id, waveCoords: waves[id].coords}))
                     .forEach(({id, waveCoords}) => addPeerRoutes({fromId: idStr, toId: id, map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
                 }
               );
-              waves && Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude && obj.coords.longitude)
+              waves && Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude !== undefined && obj.coords.longitude !== undefined)
                 .forEach(([id, {coords: {latitude: waveLatitude, longitude: waveLongitude}}])=> {
                   addPeerMarker({peerId: id, map, latitude: waveLatitude, longitude: waveLongitude, name: id})
                 })
             },
             'addPeerMarker': ({peerId, coords})=>{
-              addPeerMarker({peerId, map, latitude: coords.latitude, longitude: coords.latitude, name: peerId });
+              addPeerMarker({peerId, map, latitude: coords.latitude, longitude: coords.longitude, name: peerId });
 
             },
-            'addRouter': ({fromId, toId})=>{
-              addRouter(fromId, toId, map);
-
+            'addRoute': ({fromId, toId})=>{
+              addRoute(fromId, toId, idStr, map);
             },
-            'removeRouter': ({peerId})=>{
-              removeRouter(peerId);
+            'removeRoute': ({peerId})=>{
+              removeRoute(peerId);
             }
           };
           if (events[event.topic]) return events[event.topic](event);
@@ -165,7 +170,7 @@ const setupNode = async ({node, serviceId}) => {
     if(peerMarkerMap[disconnPeerId]){
       peerMarkerMap[disconnPeerId].marker.remove();
       delete peerMarkerMap[disconnPeerId];
-      removeRouter(disconnPeerId);
+      removeRoute(disconnPeerId);
     }
   });
   node.start(err => {
