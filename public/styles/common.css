@@ -10,13 +10,13 @@ body {
   width: 100%;
 }
 
-.leaflet-marker-icon[title="home"] {
-  filter: invert(0.5) sepia(1) saturate(10);
-}
+/*.leaflet-marker-icon[title="home"] {*/
+  /*filter: invert(0.5) sepia(1) saturate(10);*/
+/*}*/
 
-.leaflet-marker-icon:not([title="home"]) {
-  filter: invert(0.5) sepia(0.2) saturate(100) hue-rotate(90deg);
-}
+/*.leaflet-marker-icon:not([title="home"]) {*/
+  /*filter: invert(0.5) sepia(0.2) saturate(100) hue-rotate(90deg);*/
+/*}*/
 
 /* animate path */
 @keyframes line {

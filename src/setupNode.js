@@ -1,15 +1,15 @@
 import '@babel/polyfill';
 
 const pull = require('pull-stream');
-
+const { radarIcon,
+        phoneIos,
+        phoneAndroid,
+        relayIcon1,
+        relayIcon2,
+        videoIcon1,
+        videoIcon2,
+        videoIcon3 } = require("./icons");
 const DIAL_TERMINATED = "dialTerminate";
-
-const radarIcon = L.icon({
-  iconUrl: "./images/icons/radar.svg",
-  iconSize: [24, 24],
-  iconAnchor: [12, 0],
-  popupAnchor: [-3, -14]
-});
 
 const peerMarkerMap = {};
 const peerRouteMap = {};
@@ -35,14 +35,16 @@ const removeRoute  = (peerId) =>{
 
 }
 
-const addPeerMarker = ({peerId, map, latitude, longitude, name}) => {
+const addPeerMarker = ({peerId, map, latitude, longitude, name, type = "d"}) => {
   if((!latitude && latitude !== 0) ||
      (!longitude && longitude !== 0)){
     return;
   }
   let marker = L.marker([latitude, longitude], {
     title: name,
-    icon: radarIcon
+    icon: type === "p" ? relayIcon1  :
+          type === "f" ? videoIcon1 :
+          type === "w" ? phoneIos   : radarIcon
   }).addTo(map);
   addMarkerMap(peerId, marker, latitude, longitude);
   return marker;
@@ -113,11 +115,11 @@ const setupNode = async ({node, serviceId}) => {
             'initPrismInfo': async ({data: {coords, flows, waves}}) => {
               if(!coords) return;
               // add a marker of prism
-              addPeerMarker({peerId: idStr, map, latitude: coords.latitude, longitude: coords.longitude, name: "prism"});
+              addPeerMarker({peerId: idStr, map, latitude: coords.latitude, longitude: coords.longitude, name: "prism", type:"p"});
               // add markers of flows
               flows && Object.entries(flows).filter(([id, obj])=>obj.coords)
                 .forEach(([id, {coords: {latitude: flowLatitude, longitude: flowLongitude}, waves: waveIds}])=> {
-                  addPeerMarker({peerId: id, map, latitude: flowLatitude, longitude: flowLongitude, name: id });
+                  addPeerMarker({peerId: id, map, latitude: flowLatitude, longitude: flowLongitude, name: id ,type:"f"});
                   addPeerRoutes({fromId: id, toId: idStr, map, latitude: flowLatitude, longitude: flowLongitude, coords})._path.classList.add('flows');
                   waveIds && Object.entries(waveIds).map(([id])=>({id, waveCoords: waves[id].coords}))
                     .forEach(({id, waveCoords}) => addPeerRoutes({fromId: idStr, toId: id, map, latitude: coords.latitude, longitude: coords.longitude, coords: waveCoords}));
@@ -125,11 +127,11 @@ const setupNode = async ({node, serviceId}) => {
               );
               waves && Object.entries(waves).filter(([id, obj])=> obj.coords && obj.coords.latitude !== undefined && obj.coords.longitude !== undefined)
                 .forEach(([id, {coords: {latitude: waveLatitude, longitude: waveLongitude}}])=> {
-                  addPeerMarker({peerId: id, map, latitude: waveLatitude, longitude: waveLongitude, name: id})
+                  addPeerMarker({peerId: id, map, latitude: waveLatitude, longitude: waveLongitude, name: id, type:"w"})
                 })
             },
-            'addPeerMarker': ({peerId, coords})=>{
-              addPeerMarker({peerId, map, latitude: coords.latitude, longitude: coords.longitude, name: peerId });
+            'addPeerMarker': ({peerId, coords, type = "d"})=>{
+              addPeerMarker({peerId, map, latitude: coords.latitude, longitude: coords.longitude, name: peerId, type });
 
             },
             'addRoute': ({fromId, toId})=>{
