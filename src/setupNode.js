@@ -38,7 +38,10 @@ window.addPeerRoutes = addPeerRoutes;
 
 const setupNode = async ({node, serviceId}) => {
   let peers = {};
-  const map = L.map("mapid", {renderer: L.svg()}).setView(
+  const map = L.map("mapid", {
+    renderer: L.svg(),
+    scrollWheelZoom: false
+  }).setView(
     [0, 180],
     3
   );
